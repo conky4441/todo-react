@@ -23,6 +23,7 @@
     "react-dom": "^19.1.0",
     "react-hook-form": "^7.60.0",
     "tailwindcss": "^4.1.11",
+    "yarn": "^1.22.22",
     "yup": "^1.6.1"
   },
   "devDependencies": {

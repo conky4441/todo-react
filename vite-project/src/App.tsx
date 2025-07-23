@@ -1,28 +1,50 @@
 import { EditTask } from "./components/EditDialog";
-import * as xDataGrid from "@mui/x-data-grid";
+import { DataGrid, type GridColDef } from "@mui/x-data-grid";
 import Paper from "@mui/material/Paper";
 import { CreateNewTask } from "./components/NewTaskDialog";
 import "tailwindcss";
 
 export const App = () => {
-  const columns: xDataGrid.GridColDef[] = [
-    { field: "id", headerName: "ID", width: 70 },
-    { field: "firstName", headerName: "First name", width: 130 },
-    { field: "lastName", headerName: "Last name", width: 130 },
+  const columns: GridColDef[] = [
+    {
+      field: "id",
+      headerName: "ID",
+      width: 70,
+      align: "center",
+      headerAlign: "center",
+    },
+    {
+      field: "firstName",
+      headerName: "First name",
+      width: 130,
+      align: "center",
+      headerAlign: "center",
+    },
+    {
+      field: "lastName",
+      headerName: "Last name",
+      width: 130,
+      align: "center",
+      headerAlign: "center",
+    },
     {
       field: "age",
       headerName: "Age",
       type: "number",
       width: 90,
+      align: "center",
+      headerAlign: "center",
     },
+
     {
       field: "editar",
       headerName: "Editar",
       description: "Edite suas tarefas",
       sortable: false,
       width: 160,
-      valueGetter: (value, row) =>
-        `${row.firstName || ""} ${row.lastName || ""}`,
+      align: "center",
+      headerAlign: "center",
+      renderCell: () => <EditTask />,
     },
   ];
 
@@ -41,17 +63,40 @@ export const App = () => {
   const paginationModel = { page: 0, pageSize: 5 };
 
   return (
-    <Paper sx={{ height: 400, width: "100%" }}>
-      <xDataGrid.DataGrid
-        rows={rows}
-        columns={columns}
-        initialState={{ pagination: { paginationModel } }}
-        pageSizeOptions={[5, 10]}
-        checkboxSelection
-        sx={{ border: 0 }}
-      />
-      <EditTask />
+    <div className="flex flex-col items-center justify-center min-h-screen">
+      <Paper
+        sx={{
+          height: 400,
+          width: "100%",
+          maxWidth: 600,
+        }}
+      >
+        <DataGrid
+          rows={rows}
+          columns={columns}
+          initialState={{ pagination: { paginationModel } }}
+          pageSizeOptions={[5, 10]}
+          checkboxSelection
+          sx={{
+            "& .MuiDataGrid-cell": {
+              justifyContent: "center",
+              display: "flex",
+              alignItems: "center",
+              textAlign: "center",
+            },
+            "& .MuiDataGrid-columnHeader": {
+              justifyContent: "center",
+              display: "flex",
+              alignItems: "center",
+              backgroundColor: "#f67828",
+            },
+            "& .MuiDataGrid-root": {
+              minWidth: "100%",
+            },
+          }}
+        />
+      </Paper>
       <CreateNewTask />
-    </Paper>
+    </div>
   );
 };

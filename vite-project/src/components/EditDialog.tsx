@@ -1,6 +1,6 @@
 import * as React from "react";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
+import { Button, IconButton } from "@mui/material"; // Importe o IconButton
 import Dialog, { type DialogProps } from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -13,6 +13,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import SaveIcon from "@mui/icons-material/Save";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import BackspaceIcon from "@mui/icons-material/Backspace";
+import EditSquareIcon from "@mui/icons-material/EditSquare";
 
 export const EditTask = () => {
   const [open, setOpen] = React.useState(false);
@@ -29,9 +30,14 @@ export const EditTask = () => {
 
   return (
     <React.Fragment>
-      <Button variant="outlined" onClick={handleClickOpen}>
-        Editar
-      </Button>
+      <IconButton
+        sx={{ color: "#f67828" }}
+        aria-label="edit"
+        color="primary"
+        onClick={handleClickOpen}
+      >
+        <EditSquareIcon />
+      </IconButton>
 
       <Dialog
         fullWidth={fullWidth}
