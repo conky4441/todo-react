@@ -9,9 +9,10 @@ import TextField from "@mui/material/TextField";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import SaveIcon from "@mui/icons-material/Save";
+import { SaveTaskButton } from "./SaveTask";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import BackspaceIcon from "@mui/icons-material/Backspace";
+import AddIcon from "@mui/icons-material/Add";
 
 export const CreateNewTask = () => {
   const [open, setOpen] = React.useState(false);
@@ -28,7 +29,13 @@ export const CreateNewTask = () => {
 
   return (
     <React.Fragment>
-      <Button variant="outlined" onClick={handleClickOpen}>
+      <Button
+        variant="text"
+        size="small"
+        sx={{ fontSize: 12, minWidth: "unset", color: "#f67828" }}
+        startIcon={<AddIcon />}
+        onClick={handleClickOpen}
+      >
         Nova Tarefa
       </Button>
       <Dialog
@@ -79,14 +86,8 @@ export const CreateNewTask = () => {
           >
             Cancelar
           </Button>
-          <Button
-            sx={{
-              backgroundColor: "#f67828",
-            }}
-            variant="contained"
-            endIcon={<SaveIcon />}
-          >
-            Salvar
+          <Button>
+            <SaveTaskButton />
           </Button>
         </DialogActions>
       </Dialog>
