@@ -43,21 +43,21 @@ export const App = () => {
     {
       field: "titulo",
       headerName: "Atividade",
-      width: 130,
+      width: 200,
       align: "center",
       headerAlign: "center",
     },
     {
       field: "criadoem",
       headerName: "Criado em",
-      width: 130,
+      width: 160,
       align: "center",
       headerAlign: "center",
     },
     {
       field: "prazofinal",
       headerName: "Prazo final ",
-      width: 130,
+      width: 160,
       align: "center",
       headerAlign: "center",
     },
@@ -76,7 +76,7 @@ export const App = () => {
       headerName: "Editar",
       description: "Edite suas tarefas",
       sortable: false,
-      width: 160,
+      width: 120,
       align: "center",
       headerAlign: "center",
       renderCell: () => <EditTask />,
@@ -93,11 +93,11 @@ export const App = () => {
 
   return (
     <div className="flex justify-center items-center min-h-screen min-w-screen bg-[#eafcfb] ">
-      <div className="flex items-center flex-col w-5/12 shadow-md">
+      <div className="flex items-center flex-col w-full max-w-[900px] shadow-md">
         <div className="bg-[#f67828] w-full h-25 flex items-center justify-start">
           <h1 className="font-bold text-4xl text-[#fff] p-3">NL</h1>
         </div>
-        <div className="flex justify-end w-3/4 max-w-800 relative top-6">
+        <div className="flex justify-end w-full max-w-800 mr-15 relative top-6">
           <Button
             variant="text"
             size="small"
@@ -108,7 +108,7 @@ export const App = () => {
           </Button>
         </div>
         <div className="flex justify-center h-full w-full p-8 bg-[#fff]">
-          <div className="flex flex-col items-center justify-center min-w-3/4">
+          <div className="flex flex-col items-center justify-center w-full">
             <Paper
               sx={{
                 height: 400,
@@ -125,21 +125,22 @@ export const App = () => {
                 sx={{
                   "& .MuiDataGrid-cell": {
                     justifyContent: "center",
-                    display: "flex",
                     alignItems: "center",
                     textAlign: "center",
+                    whiteSpace: "normal",
+                    wordWrap: "break-word",
                   },
                   "& .MuiDataGrid-columnHeader": {
                     justifyContent: "center",
-                    display: "flex",
                     alignItems: "center",
+                    textAlign: "center",
                   },
                 }}
               />
             </Paper>
           </div>
         </div>
-        <div className="flex justify-end w-full p-5 gap-2">
+        <div className="flex justify-end w-full gap-2">
           <CreateNewTask />
           <SaveTaskButton />
         </div>
