@@ -9,15 +9,61 @@ import TextField from "@mui/material/TextField";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { SaveTaskButton } from "./SaveTask";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import BackspaceIcon from "@mui/icons-material/Backspace";
 import AddIcon from "@mui/icons-material/Add";
+import type { IToDo } from "../../App";
+import { useForm, Controller } from "react-hook-form";
+import SendAsIcon from "@mui/icons-material/Send";
+import { addDays } from "date-fns";
+import dayjs, { Dayjs } from "dayjs";
+import toast, { Toaster } from "react-hot-toast";
+import { api } from "../../services/api";
+interface INewTask {
+  titulo: string;
+  prazofinal: Dayjs;
+}
+
+export const salvarTask = async (data: IToDo) => {
+  data.id = undefined;
+  const response = await api.post("todos", data);
+  console.log(response.data);
+  return toast.success("Tarefa criada com sucesso");
+};
 
 export const CreateNewTask = () => {
   const [open, setOpen] = React.useState(false);
   const [fullWidth] = React.useState(true);
   const [maxWidth] = React.useState<DialogProps["maxWidth"]>("sm");
+
+  const { control, handleSubmit } = useForm({
+    defaultValues: {
+      titulo: "",
+      prazofinal: dayjs(addDays(new Date(), 1)),
+    },
+  });
+
+  const handleCriarTask = (data: INewTask) => {
+    const hoje = new Date();
+    const prazo = data.prazofinal.toDate();
+
+    hoje.setHours(0, 0, 0, 0);
+    prazo.setHours(0, 0, 0, 0);
+
+    if (prazo < hoje) {
+      toast.error("Essa data já passou");
+      return;
+    }
+
+    const saveNewTask: IToDo = {
+      id: -1,
+      titulo: data.titulo,
+      criadoem: hoje,
+      prazofinal: prazo,
+      concluido: false,
+    };
+    salvarTask(saveNewTask);
+  };
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -29,6 +75,9 @@ export const CreateNewTask = () => {
 
   return (
     <React.Fragment>
+      <div>
+        <Toaster />
+      </div>
       <Button
         variant="text"
         size="small"
@@ -56,40 +105,71 @@ export const CreateNewTask = () => {
             </Button>
           </DialogTitle>
         </div>
-        <DialogContent>
-          <Box
-            noValidate
-            component="form"
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              m: "auto",
-              width: "100%",
-            }}
-          >
-            <TextField id="outlined-basic" label="Tarefa" variant="outlined" />
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DemoContainer components={["DatePicker"]}>
-                <DatePicker
-                  label="Prazo"
-                  slotProps={{ textField: { fullWidth: true } }}
-                />
-              </DemoContainer>
-            </LocalizationProvider>
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={handleClose}
-            startIcon={<HighlightOffIcon sx={{ color: "#f67828" }} />}
-            sx={{ color: "#f67828" }}
-          >
-            Cancelar
-          </Button>
-          <Button>
-            <SaveTaskButton />
-          </Button>
-        </DialogActions>
+        <form onSubmit={handleSubmit(handleCriarTask)}>
+          <DialogContent>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                m: "auto",
+                width: "100%",
+              }}
+            >
+              <Controller
+                name="titulo"
+                control={control}
+                render={({ field }) => {
+                  return (
+                    <TextField
+                      id="outlined-basic"
+                      label="Tarefa"
+                      variant="outlined"
+                      {...field}
+                    />
+                  );
+                }}
+              />
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DemoContainer components={["DatePicker"]}>
+                  <Controller
+                    name="prazofinal"
+                    control={control}
+                    render={({ field }) => {
+                      return (
+                        <DatePicker
+                          label="Prazo"
+                          slotProps={{ textField: { fullWidth: true } }}
+                          {...field}
+                        />
+                      );
+                    }}
+                  />
+                </DemoContainer>
+              </LocalizationProvider>
+            </Box>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              onClick={handleClose}
+              startIcon={<HighlightOffIcon sx={{ color: "#f67828" }} />}
+              sx={{ color: "#f67828" }}
+            >
+              Cancelar
+            </Button>
+            <Button
+              type="submit"
+              variant="contained"
+              size="small"
+              sx={{
+                fontSize: 12,
+                minWidth: "unset",
+              }}
+              endIcon={<SendAsIcon sx={{ fontSize: 10 }} />}
+            >
+              Adicionar
+            </Button>
+          </DialogActions>
+        </form>
       </Dialog>
     </React.Fragment>
   );
