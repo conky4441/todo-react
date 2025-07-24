@@ -18,20 +18,15 @@ import SendAsIcon from "@mui/icons-material/Send";
 import { addDays } from "date-fns";
 import dayjs, { Dayjs } from "dayjs";
 import toast, { Toaster } from "react-hot-toast";
-import { api } from "../../services/api";
 interface INewTask {
   titulo: string;
   prazofinal: Dayjs;
 }
 
-export const salvarTask = async (data: IToDo) => {
-  data.id = undefined;
-  const response = await api.post("todos", data);
-  console.log(response.data);
-  return toast.success("Tarefa criada com sucesso");
-};
-
-export const CreateNewTask = () => {
+export const CreateNewTask = (props: {
+  dadosTabelaUnsave: IToDo[];
+  setdadosTabelaUnsave: React.Dispatch<React.SetStateAction<IToDo[]>>;
+}) => {
   const [open, setOpen] = React.useState(false);
   const [fullWidth] = React.useState(true);
   const [maxWidth] = React.useState<DialogProps["maxWidth"]>("sm");
@@ -62,7 +57,12 @@ export const CreateNewTask = () => {
       prazofinal: prazo,
       concluido: false,
     };
-    salvarTask(saveNewTask);
+
+    const newArray = props.dadosTabelaUnsave;
+
+    newArray.push(saveNewTask);
+
+    props.setdadosTabelaUnsave(newArray);
   };
 
   const handleClickOpen = () => {

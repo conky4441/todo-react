@@ -9,7 +9,8 @@ import { Button } from "@mui/material";
 import { useEffect, useState } from "react";
 import { api } from "./services/api";
 import SaveAsIcon from "@mui/icons-material/SaveAs";
-import toast, { Toaster } from "react-hot-toast";
+import { Toaster } from "react-hot-toast";
+import { salvarTask } from "./services/SaveTask";
 
 export interface IToDo {
   id?: number;
@@ -18,13 +19,6 @@ export interface IToDo {
   prazofinal: Date;
   concluido: boolean;
 }
-
-const salvarTask = async (data: IToDo) => {
-  data.id = undefined;
-  const response = await api.post("todos", data);
-  console.log(response.data);
-  return toast.success("Tarefa criada com sucesso");
-};
 
 export const App = () => {
   const carregarDados = async () => {
@@ -38,8 +32,9 @@ export const App = () => {
   }, []);
 
   const [dadosTabela, setdadosTabela] = useState<IToDo[]>([]);
-  const [dadosTabelaUnsave, setdadosTabelaUnsave] =
-    useState<IToDo[]>(dadosTabela);
+  const [dadosTabelaUnsave, setdadosTabelaUnsave] = useState<IToDo[]>(
+    dadosTabela.map((item) => ({ ...item }))
+  );
 
   const columns: GridColDef[] = [
     {
@@ -147,9 +142,12 @@ export const App = () => {
             </div>
           </div>
           <div className="flex justify-end w-full gap-2">
-            <CreateNewTask />
-            <Button
-              type="submit"
+            <CreateNewTask
+              dadosTabelaUnsave={dadosTabelaUnsave}
+              setdadosTabelaUnsave={setdadosTabelaUnsave}
+            />
+            {/* <Button
+              onSubmit={salvarTask}
               variant="contained"
               size="small"
               sx={{
@@ -157,7 +155,9 @@ export const App = () => {
                 minWidth: "unset",
               }}
               startIcon={<SaveAsIcon sx={{ fontSize: 10 }} />}
-            ></Button>
+            >
+              Salvar
+            </Button> */}
           </div>
         </div>
       </div>
