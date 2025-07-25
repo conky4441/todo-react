@@ -9,8 +9,7 @@ import { Button } from "@mui/material";
 import { useEffect, useState } from "react";
 import { api } from "./services/api";
 import SaveAsIcon from "@mui/icons-material/SaveAs";
-import { Toaster } from "react-hot-toast";
-import { salvarTask } from "./services/SaveTask";
+import toast, { Toaster } from "react-hot-toast";
 
 export interface IToDo {
   id?: number;
@@ -22,19 +21,52 @@ export interface IToDo {
 
 export const App = () => {
   const carregarDados = async () => {
-    const response = await api.get<IToDo[]>("todos");
-    console.log(response.data);
-    return setdadosTabela(response.data);
+    const response = await api.get<IToDo[]>("/todos");
+
+    setdadosTabelaUnsave(response.data);
+    setdadosTabela(response.data);
   };
+
+  const salvarTask = async () => {
+    const tasksUnsave: IToDo[] = [];
+
+    const newElements = dadosTabelaUnsave.filter(
+      (a) => typeof a.id === "number" && a.id <= -1
+    );
+
+    if (newElements.length === 0) {
+      toast.error("Não há nenhum novo item a ser salvo");
+      return;
+    }
+
+    newElements.forEach((element) => {
+      element.id = undefined;
+      tasksUnsave.push(element);
+    });
+
+    try {
+      tasksUnsave.forEach((task) => {
+        api.post("/todos", task);
+      });
+      toast.success("Lista de tarefas salva com sucesso");
+    } catch (e) {
+      toast.error(`Houve o seguinte erro: ${e}`);
+    }
+  };
+
+  const [dadosTabela, setdadosTabela] = useState<IToDo[]>([]);
+  const [dadosTabelaUnsave, setdadosTabelaUnsave] = useState<IToDo[]>([]);
+
+  const rows = dadosTabelaUnsave.map((dado) => ({
+    id: dado.id,
+    titulo: dado.titulo,
+    criadoem: dado.criadoem.toLocaleDateString("pt-BR"),
+    prazofinal: dado.prazofinal.toLocaleDateString("pt-BR"),
+  }));
 
   useEffect(() => {
     carregarDados();
   }, []);
-
-  const [dadosTabela, setdadosTabela] = useState<IToDo[]>([]);
-  const [dadosTabelaUnsave, setdadosTabelaUnsave] = useState<IToDo[]>(
-    dadosTabela.map((item) => ({ ...item }))
-  );
 
   const columns: GridColDef[] = [
     {
@@ -53,7 +85,7 @@ export const App = () => {
     },
     {
       field: "prazofinal",
-      headerName: "Prazo final ",
+      headerName: "Prazo final",
       width: 160,
       align: "center",
       headerAlign: "center",
@@ -79,12 +111,6 @@ export const App = () => {
       renderCell: () => <EditTask />,
     },
   ];
-  const rows = dadosTabelaUnsave.map((dado) => ({
-    id: dado.id,
-    titulo: dado.titulo,
-    criadoem: dado.criadoem.toLocaleDateString("pt-BR"),
-    prazofinal: dado.prazofinal.toLocaleDateString("pt-BR"),
-  }));
 
   const paginationModel = { page: 0, pageSize: 5 };
 
@@ -146,9 +172,13 @@ export const App = () => {
               dadosTabelaUnsave={dadosTabelaUnsave}
               setdadosTabelaUnsave={setdadosTabelaUnsave}
             />
-            {/* <Button
-              onSubmit={salvarTask}
+            <Button
+              onClick={salvarTask}
               variant="contained"
+              disabled={
+                JSON.stringify(dadosTabela) ===
+                JSON.stringify(dadosTabelaUnsave)
+              }
               size="small"
               sx={{
                 fontSize: 12,
@@ -157,7 +187,7 @@ export const App = () => {
               startIcon={<SaveAsIcon sx={{ fontSize: 10 }} />}
             >
               Salvar
-            </Button> */}
+            </Button>
           </div>
         </div>
       </div>

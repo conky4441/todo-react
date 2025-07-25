@@ -15,7 +15,6 @@ import AddIcon from "@mui/icons-material/Add";
 import type { IToDo } from "../../App";
 import { useForm, Controller } from "react-hook-form";
 import SendAsIcon from "@mui/icons-material/Send";
-import { addDays } from "date-fns";
 import dayjs, { Dayjs } from "dayjs";
 import toast, { Toaster } from "react-hot-toast";
 interface INewTask {
@@ -34,11 +33,12 @@ export const CreateNewTask = (props: {
   const { control, handleSubmit } = useForm({
     defaultValues: {
       titulo: "",
-      prazofinal: dayjs(addDays(new Date(), 1)),
+      prazofinal: dayjs(new Date()),
     },
   });
 
   const handleCriarTask = (data: INewTask) => {
+    let idNeg = -1;
     const hoje = new Date();
     const prazo = data.prazofinal.toDate();
 
@@ -46,23 +46,30 @@ export const CreateNewTask = (props: {
     prazo.setHours(0, 0, 0, 0);
 
     if (prazo < hoje) {
+      handleClose();
       toast.error("Essa data já passou");
       return;
     }
 
-    const saveNewTask: IToDo = {
-      id: -1,
+    props.dadosTabelaUnsave.forEach((element) => {
+      if (typeof element.id === "number" && element.id <= idNeg) {
+        idNeg = element.id - 1;
+      }
+    });
+
+    const newTask: IToDo = {
+      id: idNeg--,
       titulo: data.titulo,
       criadoem: hoje,
       prazofinal: prazo,
       concluido: false,
     };
 
-    const newArray = props.dadosTabelaUnsave;
-
-    newArray.push(saveNewTask);
-
+    const newArray = [...props.dadosTabelaUnsave, newTask];
     props.setdadosTabelaUnsave(newArray);
+
+    handleClose();
+    toast.success("Tarefa criada com sucesso");
   };
 
   const handleClickOpen = () => {
