@@ -1,11 +1,18 @@
+import * as React from "react";
 import Checkbox from "@mui/material/Checkbox";
 
-const label = { inputProps: { "aria-label": "Checkbox demo" } };
+export default function ControlledCheckbox() {
+  const [checked, setChecked] = React.useState(true);
 
-export const Checkboxes = () => {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setChecked(event.target.checked);
+  };
+
   return (
-    <div>
-      <Checkbox {...label} defaultChecked />
-    </div>
+    <Checkbox
+      checked={checked}
+      onChange={handleChange}
+      inputProps={{ "aria-label": "controlled" }}
+    />
   );
-};
+}

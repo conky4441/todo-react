@@ -2,7 +2,8 @@ import { EditTask } from "./components/buttons/EditDialog";
 import { DataGrid, type GridColDef } from "@mui/x-data-grid";
 import Paper from "@mui/material/Paper";
 import { CreateNewTask } from "./components/buttons/NewTaskDialog";
-import { Checkboxes } from "./components/Checkbox";
+import Checkbox from "@mui/material/Checkbox";
+
 import DeleteIcon from "@mui/icons-material/Delete";
 import "tailwindcss";
 import { Button } from "@mui/material";
@@ -29,7 +30,6 @@ export const App = () => {
 
   const salvarTask = async () => {
     const tasksUnsave: IToDo[] = [];
-
     const newElements = dadosTabelaUnsave.filter(
       (a) => typeof a.id === "number" && a.id <= -1
     );
@@ -56,6 +56,13 @@ export const App = () => {
 
   const [dadosTabela, setdadosTabela] = useState<IToDo[]>([]);
   const [dadosTabelaUnsave, setdadosTabelaUnsave] = useState<IToDo[]>([]);
+
+  const canSave = (id: number, concluido: boolean) => {
+    const novaLista = dadosTabelaUnsave.map((a: IToDo) =>
+      a.id === id ? { ...a, concluido } : a
+    );
+    setdadosTabela(novaLista);
+  };
 
   const rows = dadosTabelaUnsave.map((dado) => ({
     id: dado.id,
@@ -93,11 +100,17 @@ export const App = () => {
     {
       field: "concluido",
       headerName: "Concluído",
-      type: "singleSelect",
       width: 130,
       align: "center",
       headerAlign: "center",
-      renderCell: () => <Checkboxes />,
+      renderCell: (params) => (
+        <Checkbox
+          checked={params.row.concluido}
+          onChange={(e) => {
+            canSave(params.row.id, e.target.checked);
+          }}
+        />
+      ),
     },
 
     {
