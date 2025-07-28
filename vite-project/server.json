@@ -2,23 +2,16 @@
   "todos": [
     {
       "id": "1",
-      "titulo": "Fazer a atividade de React :)",
+      "titulo": "Estudar React",
       "criadoem": "2023-05-17T14:05:02.914Z",
-      "prazofinal": "2023-05-17T18:05:02.914Z",
-      "concluido": false
+      "prazofinal": "2025-07-28T14:21:20.783Z",
+      "concluido": true
     },
     {
       "id": "2",
-      "titulo": "Estudar Spring Boot",
+      "titulo": "Estudar Spring Bootaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
       "criadoem": "2023-05-18T14:05:02.914Z",
       "prazofinal": "2023-05-19T18:05:02.914Z",
-      "concluido": false
-    },
-    {
-      "id": "0f65",
-      "titulo": "ddd",
-      "criadoem": "2025-07-27T03:00:00.000Z",
-      "prazofinal": "2025-07-27T03:00:00.000Z",
       "concluido": true
     }
   ]

@@ -17,7 +17,7 @@ import { useForm, Controller } from "react-hook-form";
 import SendAsIcon from "@mui/icons-material/Send";
 import dayjs, { Dayjs } from "dayjs";
 import toast, { Toaster } from "react-hot-toast";
-interface INewTask {
+export interface INewTask {
   titulo: string;
   prazofinal: Dayjs;
 }
@@ -30,12 +30,19 @@ export const CreateNewTask = (props: {
   const [fullWidth] = React.useState(true);
   const [maxWidth] = React.useState<DialogProps["maxWidth"]>("sm");
 
-  const { control, handleSubmit } = useForm({
+  const { control, handleSubmit, reset } = useForm({
     defaultValues: {
       titulo: "",
       prazofinal: dayjs(new Date()),
     },
   });
+
+  const handleClear = () => {
+    reset({
+      titulo: "",
+      prazofinal: dayjs(new Date()),
+    });
+  };
 
   const handleCriarTask = (data: INewTask) => {
     let idNeg = -1;
@@ -104,7 +111,7 @@ export const CreateNewTask = (props: {
           <DialogTitle>Nova Tarefa:</DialogTitle>
           <DialogTitle>
             <Button
-              onClick={handleClose}
+              onClick={handleClear}
               startIcon={<BackspaceIcon sx={{ color: "#f67828" }} />}
               sx={{ color: "#f67828" }}
             >

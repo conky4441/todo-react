@@ -3,13 +3,13 @@ import { DataGrid, type GridColDef } from "@mui/x-data-grid";
 import Paper from "@mui/material/Paper";
 import { CreateNewTask } from "./components/buttons/NewTaskDialog";
 import Checkbox from "@mui/material/Checkbox";
-import DeleteIcon from "@mui/icons-material/Delete";
 import "tailwindcss";
 import { Button } from "@mui/material";
 import { useEffect, useState } from "react";
 import { api } from "./services/api";
 import SaveAsIcon from "@mui/icons-material/SaveAs";
 import toast, { Toaster } from "react-hot-toast";
+import { AlertExclude } from "./components/buttons/DeleteTask";
 
 export interface IToDo {
   id?: number;
@@ -79,11 +79,22 @@ export const App = () => {
 
   useEffect(() => {
     const saveSuccess = sessionStorage.getItem("saveSuccess");
-    carregarDados();
+    const saveFail = sessionStorage.getItem("saveFail");
+    const saveDelete = sessionStorage.getItem("saveDelete");
 
+    carregarDados();
     if (saveSuccess === "true") {
       toast.success("Lista de tarefas salva com sucesso");
       sessionStorage.removeItem("saveSuccess");
+    }
+    if (saveFail === "true") {
+      toast.error("Houve um erro ao atualizar a lista");
+      sessionStorage.removeItem("saveFail");
+    }
+
+    if (saveDelete === "true") {
+      toast.success("Tarefa excluída com sucesso");
+      sessionStorage.removeItem("saveDelete");
     }
   }, []);
 
@@ -91,7 +102,8 @@ export const App = () => {
     {
       field: "titulo",
       headerName: "Atividade",
-      width: 200,
+      flex: 1,
+      minWidth: 180,
       align: "center",
       headerAlign: "center",
     },
@@ -136,7 +148,34 @@ export const App = () => {
       width: 120,
       align: "center",
       headerAlign: "center",
-      renderCell: () => <EditTask />,
+      renderCell: ({ row }) => {
+        return (
+          <EditTask
+            id={row.id}
+            dadosTabelaUnsave={dadosTabelaUnsave}
+            setdadosTabelaUnsave={setdadosTabelaUnsave}
+          />
+        );
+      },
+    },
+    {
+      field: "excluir",
+      headerName: "Excluir",
+      description: "Exclua uma tarefa",
+      sortable: false,
+      width: 70,
+      align: "center",
+      headerAlign: "center",
+      renderCell: ({ row }) => {
+        return (
+          <AlertExclude
+            id={row.id}
+            dadosTabela={dadosTabela}
+            dadosTabelaUnsave={dadosTabelaUnsave}
+            setdadosTabelaUnsave={setdadosTabelaUnsave}
+          />
+        );
+      },
     },
   ];
 
@@ -152,16 +191,7 @@ export const App = () => {
           <div className="bg-[#f67828] w-full h-25 flex items-center justify-start">
             <h1 className="font-bold text-4xl text-[#fff] p-3">NL</h1>
           </div>
-          <div className="flex justify-end w-full max-w-800 mr-15 relative top-6">
-            <Button
-              variant="text"
-              size="small"
-              disabled
-              startIcon={<DeleteIcon />}
-            >
-              Excluir
-            </Button>
-          </div>
+          <div className="flex justify-end w-full max-w-800 mr-15 relative top-6"></div>
           <div className="flex justify-center h-full w-full p-8 bg-[#fff]">
             <div className="flex flex-col items-center justify-center w-full">
               <Paper
@@ -176,7 +206,6 @@ export const App = () => {
                   columns={columns}
                   initialState={{ pagination: { paginationModel } }}
                   pageSizeOptions={[5, 10]}
-                  checkboxSelection
                   sx={{
                     "& .MuiDataGrid-cell": {
                       justifyContent: "center",
