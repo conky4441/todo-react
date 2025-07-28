@@ -3,7 +3,6 @@ import { DataGrid, type GridColDef } from "@mui/x-data-grid";
 import Paper from "@mui/material/Paper";
 import { CreateNewTask } from "./components/buttons/NewTaskDialog";
 import Checkbox from "@mui/material/Checkbox";
-
 import DeleteIcon from "@mui/icons-material/Delete";
 import "tailwindcss";
 import { Button } from "@mui/material";
@@ -34,23 +33,29 @@ export const App = () => {
       (a) => typeof a.id === "number" && a.id <= -1
     );
 
-    if (newElements.length === 0) {
-      toast.error("Não há nenhum novo item a ser salvo");
-      return;
+    //Salvar nova Task
+    if (newElements.length !== 0) {
+      newElements.forEach((element) => {
+        element.id = undefined;
+        tasksUnsave.push(element);
+      });
+
+      try {
+        await Promise.all(tasksUnsave.map((task) => api.post("/todos", task)));
+        sessionStorage.setItem("saveSuccess", "true");
+      } catch (e) {
+        toast.error(`Houve o seguinte erro: ${e}`);
+      }
     }
 
-    newElements.forEach((element) => {
-      element.id = undefined;
-      tasksUnsave.push(element);
-    });
-
+    //Salvar se alterada
     try {
-      tasksUnsave.forEach((task) => {
-        api.post("/todos", task);
-      });
-      toast.success("Lista de tarefas salva com sucesso");
+      await Promise.all(
+        dadosTabelaUnsave.map((task) => api.put(`/todos/${task.id}`, task))
+      );
+      sessionStorage.setItem("saveSuccess", "true");
     } catch (e) {
-      toast.error(`Houve o seguinte erro: ${e}`);
+      toast.error(`Houve o seguinte erro ${e}`);
     }
   };
 
@@ -61,7 +66,7 @@ export const App = () => {
     const novaLista = dadosTabelaUnsave.map((a: IToDo) =>
       a.id === id ? { ...a, concluido } : a
     );
-    setdadosTabela(novaLista);
+    setdadosTabelaUnsave(novaLista);
   };
 
   const rows = dadosTabelaUnsave.map((dado) => ({
@@ -69,10 +74,17 @@ export const App = () => {
     titulo: dado.titulo,
     criadoem: dado.criadoem.toLocaleDateString("pt-BR"),
     prazofinal: dado.prazofinal.toLocaleDateString("pt-BR"),
+    concluido: dado.concluido,
   }));
 
   useEffect(() => {
+    const saveSuccess = sessionStorage.getItem("saveSuccess");
     carregarDados();
+
+    if (saveSuccess === "true") {
+      toast.success("Lista de tarefas salva com sucesso");
+      sessionStorage.removeItem("saveSuccess");
+    }
   }, []);
 
   const columns: GridColDef[] = [
@@ -103,14 +115,17 @@ export const App = () => {
       width: 130,
       align: "center",
       headerAlign: "center",
-      renderCell: (params) => (
-        <Checkbox
-          checked={params.row.concluido}
-          onChange={(e) => {
-            canSave(params.row.id, e.target.checked);
-          }}
-        />
-      ),
+      renderCell: ({ row }) => {
+        return (
+          <Checkbox
+            checked={row.concluido}
+            onChange={(e) => {
+              canSave(row.id, e.target.checked);
+            }}
+            inputProps={{ "aria-label": "controlled" }}
+          />
+        );
+      },
     },
 
     {
